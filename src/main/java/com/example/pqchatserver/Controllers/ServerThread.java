@@ -1,7 +1,11 @@
 package com.example.pqchatserver.Controllers;
 
+import com.example.pqchatserver.Model.Model;
+
 import java.io.*;
 import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ServerThread implements Runnable {
     private final Socket serverSocket;
@@ -13,7 +17,6 @@ public class ServerThread implements Runnable {
     public ServerThread(Socket serverSocket) {
         this.serverSocket = serverSocket;
         isClosed = false;
-//        System.out.println("Server thread number: " + clientID + " started");
     }
 
     public String getClientID() {
@@ -37,17 +40,31 @@ public class ServerThread implements Runnable {
 
                 // Handle different types of messages
                 String[] messageSplit = streamMessage.split("_");
-                if(messageSplit[0].equals("clientLogin")){
-                    System.out.println("Client : " + messageSplit[1] + " is active!");
-                    this.clientID = messageSplit[1];
-                }
-
-                if (messageSplit[0].equals("singleChat")) {
+                if(messageSplit[0].equals("evaluateAccount")){
+                    String email = messageSplit[1];
+                    String password = messageSplit[2];
+                    Boolean checkFlag = Model.getInstance().getDatabaseDriver().evaluatedAccount(email, password);
+                    if(checkFlag) {
+                        ResultSet resultSet = Model.getInstance().getDatabaseDriver().getCurrentAccount(email, password);
+                        String clientIDRS = null;
+                        try {
+                            while (resultSet.isBeforeFirst()) {
+                                clientIDRS = resultSet.getString("accountID");
+                                break;
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        this.clientID = clientIDRS;
+                        String messageForm = "evaluateAccount_" + this.clientID + "_" + "success";
+                        System.out.println("Client " + this.clientID + " is active!");
+                        Server.serverThreadBus.singleChat(this.clientID, messageForm);
+                    }
+                }else if (messageSplit[0].equals("singleChat")) {
                     System.out.println(streamMessage);
                     Server.serverThreadBus.singleChat(messageSplit[2], streamMessage);
 
-                }
-                if(messageSplit[0].equals("imageTransfer")){
+                }else if(messageSplit[0].equals("imageTransfer")){
                     System.out.println(streamMessage);
 
                     String receiver = messageSplit[2];
