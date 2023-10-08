@@ -72,7 +72,7 @@ public class ServerThread implements Runnable {
 
                     saveFile(fileName);
                     Server.serverThreadBus.singleChat(receiver, streamMessage);
-                    String projectPath = "D:\\Coding\\Back End\\Java\\JavaFX\\PQChat-Server\\src\\main\\resources\\Files\\";
+                    String projectPath = "C:\\Users\\phuquocchamp\\Coding\\Java\\JavaFX\\PQChat-Server\\src\\main\\resources\\Files\\";
                     File file = new File( projectPath + fileName);
                     transferFile(file);
 
@@ -103,7 +103,7 @@ public class ServerThread implements Runnable {
     private void saveFile( String fileName) throws IOException {
         // Nhận dữ liệu file từ client
 //        String fileName = serverReader.readLine();
-        String filePath = "D:\\Coding\\Back End\\Java\\JavaFX\\PQChat-Server\\src\\main\\resources\\Files\\" + fileName;
+        String filePath = "C:\\Users\\phuquocchamp\\Coding\\Java\\JavaFX\\PQChat-Server\\src\\main\\resources\\Files\\" + fileName;
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);
 
         byte[] buffer = new byte[1024];
